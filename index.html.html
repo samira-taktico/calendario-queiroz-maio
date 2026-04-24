@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Queiroz Associados</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,600&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --v:#1C3829;--vm:#284D38;--vl:#3A6B4E;--vp:#5C9070;
+  --o:#C9961A;--ob:#E8B020;--op:#F5D980;--obg:rgba(201,150,26,.1);
+  --cr:#F4F1EA;--crd:#E8D9C4;--w:#FDFCF9;
+  --t:#1A201C;--ts:#4A5750;--sg:#6B7A72;--sl:#A4B0A8;--sp:#E2E8E4;
+  --terra:#A06830;--humor:#8B6FC0;--news:#3A6880;
+  --pa:#1C3829;--pb:#5c3d1e;--pc:#1f3d5a;--pd:#3d2a0f;--pe:#2a1a3d;
+  --shadow:0 4px 20px rgba(28,56,41,.12);
+  --warn:#b85c00;--warn-bg:rgba(184,92,0,.1);
+}
+body{background:var(--cr);color:var(--t);font-family:'Syne',sans-serif;overflow-x:hidden}
+header{background:var(--v);padding:clamp(28px,5vw,56px) clamp(16px,4vw,52px) clamp(24px,4vw,44px);position:relative;overflow:hidden}
+header::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(201,150,26,.12) 0%,transparent 65%);pointer-events:none}
+.h-chip{display:inline-flex;align-items:center;gap:7px;background:var(--obg);border:1px solid rgba(201,150,26,.3);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ob);margin-bottom:14px}
+header h1{font-family:'Lora',serif;font-size:clamp(26px,5vw,58px);font-weight:700;color:var(--w);line-height:1}
+header h1 em{font-style:italic;color:var(--ob)}
+header p{margin-top:12px;font-size:clamp(12px,1.5vw,13px);color:var(--sl);line-height:1.6;max-width:520px}
+.h-stats{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.hstat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 16px;text-align:center}
+.hstat-n{font-family:'Lora',serif;font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--ob);line-height:1}
+.hstat-l{font-size:9px;color:var(--sl);letter-spacing:.05em;margin-top:2px}
+.main-tabs{background:var(--v);border-top:1px solid rgba(255,255,255,.07);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:100}
+.main-tabs::-webkit-scrollbar{display:none}
+.mtab{padding:14px clamp(12px,2vw,20px);font-size:clamp(10px,1.5vw,12px);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sl);cursor:pointer;border:none;border-bottom:2px solid transparent;white-space:nowrap;background:none;font-family:'Syne',sans-serif;transition:color .2s,border-color .2s;flex-shrink:0}
+.mtab:hover{color:var(--w)}.mtab.active{color:var(--ob);border-bottom-color:var(--ob)}
+.panel{display:none}.panel.active{display:block}
+.panel-inner{padding:clamp(20px,4vw,44px) clamp(14px,4vw,52px) 60px;max-width:1440px;margin:0 auto}
+.week-nav{background:var(--vm);display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.08)}
+.week-nav::-webkit-scrollbar{display:none}
+.wbtn{padding:11px clamp(10px,2vw,18px);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sl);cursor:pointer;border:none;border-bottom:2px solid transparent;white-space:nowrap;background:none;font-family:'Syne',sans-serif;transition:color .2s,border-color .2s}
+.wbtn:hover{color:var(--w)}.wbtn.active{color:var(--ob);border-bottom-color:var(--ob)}
+.wk-panel{display:none}.wk-panel.active{display:block}
+.wk-head{display:flex;align-items:flex-end;gap:14px;margin:24px 0 20px;padding-bottom:14px;border-bottom:1px solid var(--sp)}
+.wk-num{font-family:'Lora',serif;font-size:clamp(44px,8vw,72px);font-weight:700;color:var(--sp);line-height:1;flex-shrink:0}
+.wk-name{font-family:'Lora',serif;font-size:clamp(14px,2vw,20px);font-weight:600;color:var(--v)}
+.wk-sub{font-size:11px;color:var(--sg);margin-top:3px}
+.day-sec{margin-bottom:28px}
+.day-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.day-pill{background:var(--v);color:var(--w);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;white-space:nowrap}
+.day-theme{font-size:11px;color:var(--sg);font-weight:500}
+.day-rule{flex:1;min-width:30px;height:1px;background:linear-gradient(to right,var(--sp),transparent)}
+.stories-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(160px,30vw,200px),1fr));gap:10px}
+.scard{background:var(--w);border:1px solid rgba(0,0,0,.07);border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s}
+.scard:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:rgba(58,107,78,.3)}
+.sbar{height:4px}
+.bg-ouro{background:var(--o)}.bg-verde{background:var(--vl)}.bg-cinza{background:var(--sg)}.bg-dark{background:var(--v)}.bg-terra{background:var(--terra)}.bg-humor{background:var(--humor)}.bg-news{background:var(--news)}
+.scard-body{padding:12px 12px 10px}
+.scard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:7px;gap:6px}
+.sday-n{font-family:'Lora',serif;font-size:22px;font-weight:700;color:var(--sp);line-height:1;flex-shrink:0}
+.scard-badges{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.tbadge{font-size:8px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 6px;border-radius:20px;white-space:nowrap}
+.tb-v{background:rgba(58,107,78,.15);color:#2A5038}
+.tb-e{background:rgba(201,150,26,.15);color:#7A5C00}
+.tb-c{background:rgba(60,72,64,.12);color:#3A4840}
+.tb-f{background:rgba(139,111,192,.12);color:#5A3890}
+.tb-h{background:rgba(139,111,192,.18);color:#4A2880}
+.tb-n{background:rgba(58,104,128,.15);color:#1A4860}
+.tb-cta{background:var(--v);color:var(--ob)}
+.tb-r{background:rgba(58,107,78,.2);color:#1C4430}
+.tb-dep{background:rgba(201,150,26,.25);color:#5A3800}
+.fmt-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:20px;background:var(--sp);color:var(--sg)}
+.ia-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:20px;background:rgba(201,150,26,.2);color:#7A4800;border:1px solid rgba(201,150,26,.3)}
+.warn-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:20px;background:var(--warn-bg);color:var(--warn);border:1px solid rgba(184,92,0,.25)}
+.scard-title{font-size:11px;font-weight:500;line-height:1.4;color:var(--t);margin-bottom:7px;min-height:32px}
+.scard-caption{font-size:10px;color:var(--ts);font-style:italic;border-left:2px solid var(--o);padding-left:6px;margin-bottom:8px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.scard-foot{border-top:1px solid var(--sp);padding-top:7px;display:flex;align-items:center;justify-content:space-between;gap:4px}
+.scard-el{font-size:9px;color:var(--sg);display:flex;align-items:center;gap:4px}
+.el-dot{width:5px;height:5px;border-radius:50%;background:var(--vl);flex-shrink:0}
+.scard-arr{width:16px;height:16px;border-radius:50%;background:rgba(40,77,56,.1);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--vl);flex-shrink:0}
+.scard:hover .scard-arr{background:rgba(58,107,78,.2)}
+.moverlay{display:none;position:fixed;inset:0;background:rgba(8,18,12,.85);z-index:400;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)}
+.moverlay.open{display:flex}
+.modal{background:var(--w);border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;animation:mIn .25s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.m-top{height:6px;border-radius:16px 16px 0 0}
+.m-hd{padding:16px 20px 12px;border-bottom:1px solid var(--sp);position:sticky;top:0;background:var(--w);z-index:1;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.m-title{font-family:'Lora',serif;font-size:clamp(14px,2.5vw,18px);font-weight:700;color:var(--t);line-height:1.3;margin-top:6px}
+.m-close{background:var(--sp);border:none;color:var(--sg);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:background .2s}
+.m-close:hover{background:var(--sl)}
+.m-body{padding:18px 20px 24px}
+.m-sec{margin-bottom:16px}
+.m-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--vl);margin-bottom:6px}
+.m-text{font-size:12px;color:var(--ts);line-height:1.7}
+.m-cap{background:var(--v);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--op);line-height:1.6;font-style:italic}
+.m-fmt-row{display:flex;gap:8px;flex-wrap:wrap}
+.m-fmt-pill{display:flex;align-items:center;gap:5px;background:var(--cr);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--t)}
+.m-fmt-pill span:first-child{font-size:16px}
+.m-fmt-pill strong{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sg);display:block;margin-bottom:1px}
+.m-fmt-pill-ia{background:rgba(201,150,26,.12);border:1px solid rgba(201,150,26,.25)}
+.m-fmt-pill-warn{background:var(--warn-bg);border:1px solid rgba(184,92,0,.25)}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:440px){.m-grid{grid-template-columns:1fr}}
+.m-item{background:var(--cr);border-radius:7px;padding:9px 10px}
+.m-il{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sg);margin-bottom:2px}
+.m-iv{font-size:11px;color:var(--t);line-height:1.4}
+.m-item-warn{background:var(--warn-bg);border:1px solid rgba(184,92,0,.2)}
+.m-item-warn .m-il{color:var(--warn)}
+.m-item-warn .m-iv{color:var(--warn)}
+.m-cta{background:var(--v);border-radius:8px;padding:11px 14px;font-size:12px;color:var(--w);line-height:1.5;display:flex;align-items:flex-start;gap:8px}
+.m-cta-ic{color:var(--ob);flex-shrink:0}
+.videos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(280px,40vw,360px),1fr));gap:14px}
+.vcard{background:var(--w);border:1px solid var(--crd);border-radius:13px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.vcard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.vcard-top{display:flex;align-items:center;gap:10px;padding:14px 16px}
+.vnum{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;color:#fff}
+.vmeta{flex:1;min-width:0}
+.vpilar{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px}
+.vtitle{font-weight:600;font-size:13px;color:var(--v);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vday{font-size:10px;color:var(--sg);flex-shrink:0;text-align:right}
+.vday strong{display:block;font-size:17px;font-weight:700;color:var(--v)}
+.vdiv{height:1px;background:var(--crd)}
+.vgancho{padding:10px 16px;background:var(--v);color:var(--cr);font-size:12px;font-style:italic;line-height:1.5;position:relative}
+.vgancho::before{content:'⚡ GANCHO';display:block;font-size:8px;font-style:normal;font-weight:700;letter-spacing:1.5px;color:var(--op);margin-bottom:3px}
+.vdetails{padding:14px 16px;display:none}
+.vcard.expanded .vdetails{display:block}
+.dlbl{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--sg);margin-bottom:4px}
+.dtext{font-size:12px;color:var(--v);line-height:1.6;margin-bottom:12px}
+.dsteps{list-style:none;margin-bottom:12px}
+.dsteps li{font-size:12px;color:var(--v);padding:5px 0 5px 22px;position:relative;border-bottom:1px dashed var(--crd);line-height:1.5}
+.dsteps li:last-child{border-bottom:none}
+.dsteps li::before{content:attr(data-s);position:absolute;left:0;font-weight:700;font-size:9px;color:var(--o);top:6px}
+.dobj{display:inline-block;background:var(--v);color:var(--op);font-size:10px;font-weight:600;padding:4px 10px;border-radius:4px;margin-bottom:12px}
+.dcta{background:linear-gradient(135deg,var(--o) 0%,#b07830 100%);border-radius:7px;padding:9px 12px;color:var(--v);font-size:12px;font-weight:600;line-height:1.5}
+.dcta::before{content:'📣 CTA';display:block;font-size:8px;letter-spacing:1.2px;margin-bottom:2px;opacity:.7}
+.vhint{text-align:center;font-size:10px;color:var(--sg);padding:8px;letter-spacing:.4px;border-top:1px solid var(--crd)}
+.vcard.expanded .vhint{color:var(--o)}
+.pilares-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(260px,40vw,320px),1fr));gap:16px}
+.pcard{border-radius:12px;overflow:hidden;border:1px solid var(--crd)}
+.pcard-hd{padding:20px 22px;display:flex;align-items:center;gap:12px}
+.picon{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pcard-hd h3{font-family:'Lora',serif;font-size:16px;font-weight:700;color:var(--cr)}
+.pcard-hd p{font-size:11px;color:rgba(245,237,224,.6);margin-top:2px}
+.pcard-body{background:var(--cr);padding:18px 22px}
+.pcard-body p{font-size:13px;color:var(--v);line-height:1.65;margin-bottom:12px}
+.ptags{display:flex;flex-wrap:wrap;gap:5px}
+.ptag{background:var(--v);color:var(--cr);font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px}
+.pa-hd{background:var(--v)}.pa-icon{background:rgba(201,150,26,.2)}
+.pb-hd{background:var(--pb)}.pb-icon{background:rgba(245,237,224,.15)}
+.pc-hd{background:var(--pc)}.pc-icon{background:rgba(61,122,71,.2)}
+.pd-hd{background:var(--pd)}.pd-icon{background:rgba(200,146,58,.2)}
+.pe-hd{background:var(--pe)}.pe-icon{background:rgba(200,146,58,.2)}
+.strat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(260px,40vw,300px),1fr));gap:16px;margin-bottom:28px}
+.strat-card{background:var(--w);border:1px solid var(--crd);border-radius:12px;padding:22px;position:relative;overflow:hidden}
+.strat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--o)}
+.strat-card h3{font-family:'Lora',serif;font-size:17px;color:var(--v);font-weight:700;margin-bottom:10px}
+.strat-card p{font-size:13px;color:#555;line-height:1.7}
+.strat-card ul{list-style:none;margin-top:10px}
+.strat-card ul li{font-size:12px;color:#555;padding:4px 0 4px 15px;position:relative;line-height:1.5}
+.strat-card ul li::before{content:'→';position:absolute;left:0;color:var(--o);font-weight:700}
+.insight-box{background:var(--cr);border-radius:12px;padding:24px;border-left:4px solid var(--o)}
+.insight-box h3{font-family:'Lora',serif;font-size:18px;color:var(--v);margin-bottom:12px}
+.insight-box p{font-size:13px;color:#555;line-height:1.75;margin-bottom:10px}
+.sec-kicker{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ob);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.sec-kicker::before{content:'';width:18px;height:2px;background:var(--ob)}
+.sec-title{font-family:'Lora',serif;font-size:clamp(20px,3vw,28px);font-weight:700;color:var(--v);margin-bottom:6px}
+.sec-sub{font-size:13px;color:var(--sg);line-height:1.6;max-width:580px;margin-bottom:28px}
+.legend{background:var(--vm);padding:12px clamp(14px,4vw,52px);display:flex;gap:14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.07)}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--sl)}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.funil-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.funil-card{background:var(--v);border-radius:10px;padding:16px;text-align:center}
+.funil-n{font-family:'Lora',serif;font-size:30px;font-weight:700;color:var(--ob);line-height:1}
+.funil-l{font-size:9px;color:var(--sl);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.week-lbl{display:flex;align-items:center;gap:12px;margin:28px 0 16px}
+.week-lbl h3{font-family:'Lora',serif;font-size:20px;color:var(--v);font-weight:700;white-space:nowrap}
+.week-lbl::after{content:'';flex:1;height:1px;background:var(--crd)}
+.week-lbl:first-child{margin-top:0}
+.pa-c{background:var(--pa)}.pb-c{background:var(--pb)}.pc-c{background:var(--pc)}.pd-c{background:var(--pd)}.pe-c{background:var(--pe)}
+.pa-t{color:var(--pa)}.pb-t{color:var(--pb)}.pc-t{color:var(--pc)}.pd-t{color:var(--pd)}.pe-t{color:var(--pe)}
+.pa-bg{background:rgba(26,58,31,.06)}.pb-bg{background:rgba(92,61,30,.06)}.pc-bg{background:rgba(31,61,90,.06)}.pd-bg{background:rgba(61,42,15,.06)}.pe-bg{background:rgba(42,26,61,.06)}
+footer{background:var(--v);padding:20px clamp(14px,4vw,52px);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.fbrand{font-family:'Lora',serif;font-size:15px;font-weight:700;color:var(--ob)}
+.fsub{font-size:10px;color:var(--sg)}
+@media(max-width:600px){.stories-row{grid-template-columns:1fr 1fr}.m-grid{grid-template-columns:1fr}.funil-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:400px){.stories-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-chip">📋 Dashboard Estratégico</div>
+  <h1>Queiroz Associados<br><em>Planejamento de Conteúdo</em></h1>
+  <p>Stories diários + vídeos de feed com foco em nicho bancário rural: revisão de juros, prorrogação, alongamento de dívida, penhora, bloqueios e proteção patrimonial.</p>
+  <div class="h-stats">
+    <div class="hstat"><div class="hstat-n">30</div><div class="hstat-l">stories / mês</div></div>
+    <div class="hstat"><div class="hstat-n">20</div><div class="hstat-l">vídeos feed</div></div>
+    <div class="hstat"><div class="hstat-n">5</div><div class="hstat-l">pilares</div></div>
+    <div class="hstat"><div class="hstat-n">7</div><div class="hstat-l">formatos stories</div></div>
+  </div>
+</header>
+
+<div class="main-tabs" id="main-tabs">
+  <button class="mtab active" data-tab="stories">📱 Stories (30 dias)</button>
+  <button class="mtab" data-tab="feed">🎬 Feed (20 vídeos)</button>
+  <button class="mtab" data-tab="pilares">🌿 Pilares</button>
+  <button class="mtab" data-tab="estrategia">🎯 Estratégia</button>
+</div>
+
+<div class="panel active" id="panel-stories">
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:var(--o)"></div>Atenção/Abertura</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--vl)"></div>Educação/Autoridade</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--sg)"></div>Enquete/Interação</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--v)"></div>CTA/Conversão</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--terra)"></div>Campo/Bastidor</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--humor)"></div>Humor</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--news)"></div>Notícia da Semana</div>
+  </div>
+  <div class="week-nav" id="stories-week-nav"></div>
+  <div class="panel-inner" id="stories-content"></div>
+</div>
+
+<div class="panel" id="panel-feed">
+  <div class="panel-inner">
+    <div class="funil-grid">
+      <div class="funil-card"><div class="funil-n">20</div><div class="funil-l">Vídeos Totais</div></div>
+      <div class="funil-card"><div class="funil-n">5</div><div class="funil-l">Por Semana</div></div>
+      <div class="funil-card"><div class="funil-n">5</div><div class="funil-l">Pilares</div></div>
+      <div class="funil-card"><div class="funil-n">45s</div><div class="funil-l">Máx. por vídeo</div></div>
+    </div>
+    <div id="feed-content"></div>
+  </div>
+</div>
+
+<div class="panel" id="panel-pilares">
+  <div class="panel-inner">
+    <div class="sec-kicker">5 Pilares de Conteúdo</div>
+    <div class="sec-title">Os pilares estratégicos do mês</div>
+    <div class="sec-sub">Cada pilar tem uma função clara no funil — do topo (awareness) ao fundo (conversão). A alternância entre pilares evita fadiga temática e garante alcance máximo.</div>
+    <div class="pilares-grid" id="pilares-content"></div>
+  </div>
+</div>
+
+<div class="panel" id="panel-estrategia">
+  <div class="panel-inner">
+    <div class="sec-kicker">Por trás do calendário</div>
+    <div class="sec-title">A Estratégia</div>
+    <div class="sec-sub">Mecanismos que fazem o conteúdo crescer, engajar e converter no nicho Agro Bancário.</div>
+    <div class="strat-grid" id="strat-content"></div>
+    <div class="insight-box" id="insight-box"></div>
+  </div>
+</div>
+
+<footer>
+  <div><div class="fbrand">Queiroz Associados</div><div class="fsub">Direito Agro · Nicho Bancário · Proteção Patrimonial do Produtor Rural</div></div>
+  <div class="fsub" style="color:var(--sl)">Dashboard estratégico de conteúdo</div>
+</footer>
+
+<div class="moverlay" id="smodal" onclick="closeSModal(event)">
+  <div class="modal">
+    <div class="m-top" id="m-bar"></div>
+    <div class="m-hd">
+      <div>
+        <span class="tbadge" id="m-badge" style="margin-bottom:4px;display:inline-block"></span>
+        <div class="m-title" id="m-title"></div>
+      </div>
+      <button class="m-close" onclick="document.getElementById('smodal').classList.remove('open')">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="m-sec"><div class="m-lbl">Formato & Interação</div><div class="m-fmt-row" id="m-fmt"></div></div>
+      <div class="m-sec"><div class="m-lbl">Legenda / Texto Sobreposto</div><div class="m-cap" id="m-cap"></div></div>
+      <div class="m-sec"><div class="m-lbl">Roteiro Completo</div><div class="m-text" id="m-rot"></div></div>
+      <div class="m-sec"><div class="m-lbl">Produção & Elemento IG</div><div class="m-grid" id="m-els"></div></div>
+      <div class="m-sec"><div class="m-lbl">CTA</div><div class="m-cta"><span class="m-cta-ic">▶</span><span id="m-cta"></span></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const storyWeeks = [
+  { label:'Semana 1', sub:'Dias 1–7 · Apresentação & Nicho Bancário Rural', days:[
+    { pill:'Dia 1 · Segunda', theme:'Abertura forte — quem é o Queiroz Associados', stories:[
+      { n:'01', bar:'bg-ouro', badge:'Vídeo', bc:'tb-v', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Quem é o Queiroz Associados — e quem nós protegemos',
+        caption:'"Não trabalhamos apenas com Direito Rural, nós protegemos o patrimônio de quem planta e produz contra juros abusivos e execuções bancárias."',
+        roteiro:'Vídeo curto de apresentação. Advogado fala sobre a origem e por que decidiu estudar Direito: "Eu sou filho de produtor rural. E virei advogado para que nenhuma família perca o que construiu por causa de um banco cobrando o dobro do que deveria." Tom: próximo, autêntico, sem terno. Foco: proteção contra abusos bancários no agro.',
+        els:[{l:'Formato',v:'Vídeo no campo ou escritório'},{l:'Roupa',v:'Casual — sem terno'},{l:'Tom',v:'Apresentação pessoal, autêntica'},{l:'Duração',v:'20–30 segundos'}],
+        cta:'↓ Amanhã: por que o banco pode estar te cobrando juros ilegais ↓'},
+      { n:'—', bar:'bg-cinza', badge:'Enquete', bc:'tb-e', fmt:'✍️ Texto', ia:'📊 Enquete', warn:false,
+        title:'Você já verificou se os juros do seu financiamento estão corretos?',
+        caption:'"Sim, conferi tudo / Nunca parei para verificar"',
+        roteiro:'Enquete que abre o ciclo de engajamento. Fundo verde. A maioria dos produtores rurais paga juros sem questionar se estão corretos. Quem responder "nunca parei para verificar" → DM: "Você não está sozinho. A maioria dos contratos tem irregularidades. Me conta um pouco sobre o seu financiamento."',
+        els:[{l:'Elemento IG',v:'Enquete (2 opções)'},{l:'Ação',v:'DM para quem nunca verificou'},{l:'Tom',v:'Sem julgamento'},{l:'Fundo',v:'Verde mata'}],
+        cta:'DM empático para quem nunca verificou os juros do contrato.'}
+    ]},
+    { pill:'Dia 2 · Terça', theme:'Urgência bancária — juros abusivos', stories:[
+      { n:'02', bar:'bg-ouro', badge:'Vídeo', bc:'tb-v', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'O banco pode estar te cobrando juros ilegais agora mesmo',
+        caption:'"Em média, 70% dos contratos de financiamento rural têm irregularidades nos juros. O seu pode ser um deles."',
+        roteiro:'Vídeo direto de 20 segundos. Tom sério. "Quando você assinou o contrato com o banco, você confiou nos números que vieram prontos. Mas sabia que a maioria dos contratos tem juros acima do permitido por lei? Capitalização indevida, taxas não divulgadas, seguros embutidos — tudo isso inflaciona a dívida que você paga todo mês." Encerra: "Isso tem solução judicial. Mas precisa ser identificado antes que a execução chegue."',
+        els:[{l:'Formato',v:'Vídeo câmera fixa ou selfie'},{l:'Destaque',v:'Dado de 70% em texto sobreposto'},{l:'Tom',v:'Sério, direto, sem alarmismo'},{l:'Duração',v:'20 segundos'}],
+        cta:'Próximo story: termômetro sobre preocupação com dívida bancária.'},
+      { n:'—', bar:'bg-cinza', badge:'Termômetro', bc:'tb-e', fmt:'✍️ Texto', ia:'📏 Termômetro', warn:false,
+        title:'Termômetro: o quanto a sua dívida bancária te preocupa hoje?',
+        caption:'"Arrasta e me conta a sua realidade."',
+        roteiro:'Barra deslizante do IG. Emoji 😌 no início e 😰 no final. "Sendo honesto: o quanto a sua dívida com o banco te tira o sono?" Quem marcar alto → DM: "Me conta um pouco mais. Talvez eu consiga te ajudar a ver uma saída."',
+        els:[{l:'Elemento IG',v:'Barra deslizante (escala)'},{l:'Ação',v:'DM para quem marcar acima de 70%'},{l:'Fundo',v:'Verde profundo'},{l:'Tom',v:'Empático'}],
+        cta:'Abertura orgânica de DMs com quem marcou preocupação alta.'}
+    ]},
+    { pill:'Dia 3 · Quarta', theme:'Notícia da semana — bancária', stories:[
+      { n:'03', bar:'bg-news', badge:'Notícia', bc:'tb-n', fmt:'🔄 Repost', ia:null, warn:false,
+        title:'Notícia da Semana: Selic, crédito rural ou renegociação de dívidas',
+        caption:'"O que essa movimentação significa para quem tem financiamento rural? Eu explico."',
+        roteiro:'Repost de manchete real sobre taxa Selic, crédito rural, financiamento agrícola, Pronaf, ou programas de renegociação de dívidas. Sublinhar com caneta IG o dado mais importante. Texto sobreposto: "O que isso muda para o produtor com financiamento ativo." Tom: informativo e protetor, nunca alarmista.',
+        els:[{l:'Formato',v:'Repost de manchete + texto sobreposto'},{l:'Ferramenta IG',v:'Caneta para sublinhar dado-chave'},{l:'Fonte',v:'G1 Agro, Canal Rural, Valor Econômico'},{l:'Tom',v:'"Eu traduzo isso para você"'}],
+        cta:'"Salva esse story. Essa informação vai ser útil na hora que você menos espera."'}
+    ]},
+    { pill:'Dia 4 · Quinta', theme:'Humor — filho de produtor (copy do Anderson)', stories:[
+      { n:'04', bar:'bg-humor', badge:'Humor', bc:'tb-h', fmt:'🎬 Vídeo', ia:null, warn:true,
+        title:'Quando meu pai descobriu que eu virei advogado',
+        caption:'"Meu pai achou que eu ia plantar menos. Mas hoje eu defendo quem planta."',
+        roteiro:'⚠️ COPY DEVE SER ESCRITA E VALIDADA PELO PRÓPRIO ANDERSON, com base na sua experiência real como filho de produtor rural. Vídeo leve e descontraído. Anderson conta a reação da família quando anunciou que ia cursar Direito. Tom: sorrindo, sem forçar a piada. A graça está na verdade da situação — e somente Anderson sabe qual é essa verdade.',
+        els:[{l:'⚠️ Atenção',v:'Copy escrita pelo Anderson — baseada na vivência real dele'},{l:'Formato',v:'Vídeo curto — selfie ou câmera fixa'},{l:'Tom',v:'Leve, genuíno, memória real'},{l:'Duração',v:'15–25 segundos'}],
+        cta:'"Me conta nos comentários: alguém da sua família achou estranha a sua escolha de carreira?"'},
+      { n:'—', bar:'bg-humor', badge:'Humor', bc:'tb-h', fmt:'📸 Foto', ia:null, warn:true,
+        title:'Duas versões do advogado: de bota para terno',
+        caption:'"No domingo ajudei plantar na terra. Na segunda um contrato de R$300 mil. A vida dupla do advogado filho de produtor."',
+        roteiro:'⚠️ COPY DEVE SER ADAPTADA PELO ANDERSON com base na vivência real dele. Story de texto ou foto com legenda impactante. Pode ser foto dividida: bota de borracha e gravata lado a lado. Humor baseado no contraste real da vida de quem nasceu no campo e foi para o Direito.',
+        els:[{l:'⚠️ Atenção',v:'Copy validada pelo Anderson'},{l:'Formato',v:'Foto dividida ou story de texto'},{l:'Tom',v:'Humor genuíno de quem viveu'},{l:'Objetivo',v:'Compartilhamento + identificação'}],
+        cta:'"Marca aquele amigo que também leva essa vida dupla."'}
+    ]},
+    { pill:'Dia 5 · Sexta', theme:'Bastidor de campo', stories:[
+      { n:'05', bar:'bg-terra', badge:'Campo', bc:'tb-f', fmt:'📸 Foto ou 🎬 Vídeo', ia:null, warn:false,
+        title:'Bastidor: visita ao campo ou análise de contrato',
+        caption:'"Indo conferir um levantamento de área. O Direito no Agro acontece no chão da fazenda."',
+        roteiro:'Foto ou vídeo natural — porteira, estrada, horizonte da fazenda. Câmera natural, sem pose. Narração opcional: "Hoje é dia de campo. Porque antes de fechar qualquer estratégia jurídica, precisamos entender de perto o que está sendo protegido." SOMENTE postar quando houver visita real.',
+        els:[{l:'Condição',v:'SOMENTE quando houver visita real'},{l:'Formato',v:'Foto ou vídeo natural, sem pose'},{l:'Local',v:'Porteira, estrada, campo, levantamento'},{l:'Roupa',v:'Bota, boné — o que estava usando'}],
+        cta:'↓ Caixinha aberta sábado: "Sua maior dúvida sobre dívida bancária, juros ou proteção do patrimônio?" ↓'}
+    ]},
+    { pill:'Dia 6 · Sábado', theme:'Caixinha aberta — nicho bancário', stories:[
+      { n:'06', bar:'bg-cinza', badge:'Caixinha', bc:'tb-c', fmt:'📸 Foto ou 🎬 Vídeo', ia:'💬 Caixinha de Perguntas', warn:false,
+        title:'Caixinha: sua maior dúvida sobre dívida bancária, prorrogação, revisão de juros ou proteção do patrimônio',
+        caption:'"Manda aqui. Respondo as melhores na terça em vídeo."',
+        roteiro:'Story com caixinha de perguntas do IG. Fundo escritório ou sala. Texto acima: "Sua maior dúvida sobre: dívida bancária | prorrogação | alongamento de prazo | revisão de juros | proteção do patrimônio." Texto abaixo: "Respondo as melhores na terça. Sem juridiquês." Toda pergunta é uma abertura de DM.',
+        els:[{l:'Elemento IG',v:'Caixinha de perguntas'},{l:'Temas',v:'Dívida bancária, prorrogação, revisão de juros, proteção patrimonial'},{l:'Comprometimento',v:'Resposta em vídeo na terça'},{l:'Ação',v:'Responder DM de pergunta urgente'}],
+        cta:'Cada pergunta é uma abertura de conversa no DM.'}
+    ]},
+    { pill:'Dia 7 · Domingo', theme:'Humanização + descanso', stories:[
+      { n:'07', bar:'bg-humor', badge:'Foto', bc:'tb-f', fmt:'📸 Foto', ia:null, warn:false,
+        title:'Domingo: foto do descanso — família, campo ou hobby',
+        caption:'"Descanso de quem cuida do patrimônio alheio começa por cuidar do próprio."',
+        roteiro:'Foto genuína de fim de semana. Família, churrasco, pesca, caminhada na propriedade. Sem pose, sem edição elaborada. O produtor rural confia em quem parece ser como ele. A legenda curta fecha a semana com humanidade.',
+        els:[{l:'Formato',v:'Foto pessoal natural'},{l:'Pessoas',v:'Família, amigos (com permissão)'},{l:'Edição',v:'Mínima'},{l:'Tom',v:'Grato, humano, sem venda'}],
+        cta:'Sem CTA de produto — descanso também é posicionamento.'}
+    ]}
+  ]},
+  { label:'Semana 2', sub:'Dias 8–14 · Proteção Bancária & Direitos do Produtor', days:[
+    { pill:'Dia 8 · Segunda', theme:'Defesa contra execução bancária', stories:[
+      { n:'08', bar:'bg-verde', badge:'Educação', bc:'tb-v', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Como o banco pode executar seu contrato — e o que você pode fazer antes disso',
+        caption:'"Execução bancária não começa no leilão. Começa muito antes. E há uma janela para agir."',
+        roteiro:'Vídeo educativo de 25–30 segundos. "Existe um momento que todo produtor com dívida bancária teme: a execução do contrato. Mas o que a maioria não sabe é que entre a inadimplência e o leilão existe uma série de instrumentos jurídicos: revisão de juros, prorrogação de prazo, embargos à execução, contestação de penhora." Pausa. "Você tem mais opções do que imagina. Mas esses instrumentos têm prazo. Agir cedo muda tudo."',
+        els:[{l:'Formato',v:'Vídeo câmera fixa, estável'},{l:'Tom',v:'Firme, educativo, tranquilizador'},{l:'Mensagem-chave',v:'Há instrumentos jurídicos antes do leilão'},{l:'Duração',v:'25–30 segundos'}],
+        cta:'↓ Amanhã: resposta da caixinha de sábado ↓'},
+      { n:'—', bar:'bg-verde', badge:'Educação', bc:'tb-v', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'3 direitos que o banco não vai te contar quando executar o contrato',
+        caption:'"Revisão de juros, prorrogação e contestação de penhora — seus direitos que o banco prefere que você não conheça."',
+        roteiro:'Vídeo ou texto em motion. 3 bullets: 1) Revisão de juros — contratos com capitalização indevida podem ser recalculados judicialmente. 2) Prorrogação e alongamento — direito de renegociar prazo antes da execução avançar. 3) Contestação de penhora — nem todo bem pode ser penhorado, e há defesas processuais com prazo curto.',
+        els:[{l:'Formato',v:'Vídeo ou texto em motion'},{l:'Bullets',v:'3 direitos concretos'},{l:'Tom',v:'Consultivo e prático'},{l:'Objetivo',v:'Alta taxa de salvamento'}],
+        cta:'"Salva esse story. Um desses 3 direitos pode ser exatamente o que você precisa agora."'}
+    ]},
+    { pill:'Dia 9 · Terça', theme:'Resposta da caixinha — revisão de juros', stories:[
+      { n:'09', bar:'bg-verde', badge:'Resposta', bc:'tb-r', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Resposta da caixinha: "Tenho financiamento atrasado — o banco pode tomar meu bem?"',
+        caption:'"Depende — e essa resposta pode mudar completamente o que você faz agora."',
+        roteiro:'Exibir a pergunta (screenshot ou texto digitado). Vídeo de resposta de 25 segundos. Três cenários: 1) Dívida em fase de cobrança — ainda há espaço para negociação e revisão contratual. 2) Execução iniciada — existem embargos e contestações que suspendem o processo. 3) Penhora determinada — há bens impenhoráveis por lei e prazo para contestar. Final: "Cada caso é diferente. Mas você tem mais opções do que o banco te diz."',
+        els:[{l:'Formato',v:'Screenshot da pergunta + vídeo resposta'},{l:'Tom',v:'Firme e acolhedor'},{l:'Estrutura',v:'3 cenários práticos'},{l:'Duração',v:'25–30 segundos'}],
+        cta:'"Tem dúvidas sobre sua situação específica? Me manda no direct."'}
+    ]},
+    { pill:'Dia 10 · Quarta', theme:'Notícia da semana', stories:[
+      { n:'10', bar:'bg-news', badge:'Notícia', bc:'tb-n', fmt:'🔄 Repost', ia:null, warn:false,
+        title:'Notícia da Semana: crédito rural ou renegociação de dívidas',
+        caption:'"O que mudou essa semana que afeta diretamente quem tem financiamento rural."',
+        roteiro:'Buscar a notícia mais relevante da semana: crédito rural, Pronaf, taxas bancárias, renegociação de dívidas rurais. Repost com texto sobreposto. Caneta IG sublinhando o ponto crítico. Explicação em 2 linhas: "O que isso muda na prática para você."',
+        els:[{l:'Fonte',v:'G1 Agro, Canal Rural, Valor Econômico'},{l:'Ferramenta',v:'Caneta IG para destacar'},{l:'Explicação',v:'2 linhas de implicação prática'},{l:'Tom',v:'"Eu traduzo o jurídico para você"'}],
+        cta:'"Salva e manda pro grupo de WhatsApp da sua cooperativa."'}
+    ]},
+    { pill:'Dia 11 · Quinta', theme:'Humor — dinâmico (validar jurídico)', stories:[
+      { n:'11', bar:'bg-humor', badge:'Humor', bc:'tb-h', fmt:'🎬 Vídeo', ia:null, warn:true,
+        title:'Quando o cliente explica o problema com termos do campo',
+        caption:'"Cliente: \'O vizinho quer pegar parte da minha terra.\' Eu: \'Isso se chama disputa de limites de propriedade.\'"',
+        roteiro:'⚠️ VALIDAR COPY COM EQUIPE JURÍDICA antes de publicar. Vídeo curto com tom de comédia situacional. Exemplo de conversa real onde o produtor usa linguagem de campo e o advogado "traduz" para o técnico. O humor vem da verdade da situação — não é piada inventada.',
+        els:[{l:'⚠️ Atenção',v:'Validar copy com equipe jurídica antes de publicar'},{l:'Formato',v:'Vídeo dialogado ou só narrando'},{l:'Tom',v:'Divertido, genuíno'},{l:'Duração',v:'15–20 segundos'}],
+        cta:'"Manda aqui a frase mais engraçada que um cliente já te falou."'}
+    ]},
+    { pill:'Dia 12 · Sexta', theme:'Bastidor — campo ou escritório (validar jurídico)', stories:[
+      { n:'12', bar:'bg-terra', badge:'Campo', bc:'tb-f', fmt:'📸 Foto ou 🎬 Vídeo', ia:null, warn:true,
+        title:'Bastidor: analisando contrato de financiamento rural no escritório',
+        caption:'"Quando não tem como ir ao campo, o campo chega até mim — em forma de contrato."',
+        roteiro:'⚠️ VALIDAR COPY COM EQUIPE JURÍDICA. Se não houver visita de campo: foto ou vídeo de documento sendo analisado na mesa, com dados do cliente cobertos. Narração: "Esse contrato de financiamento chegou hoje. Já identifiquei três pontos que precisam ser questionados."',
+        els:[{l:'⚠️ Atenção',v:'Validar copy com jurídico antes de publicar'},{l:'Condição',v:'Quando não houver visita real de campo'},{l:'Privacidade',v:'Dados sempre cobertos'},{l:'Tom',v:'Trabalho real, bastidor técnico'}],
+        cta:'↓ Fim de semana: termômetro + CTA ↓'}
+    ]},
+    { pill:'Dia 13 · Sábado', theme:'Termômetro + CTA', stories:[
+      { n:'13', bar:'bg-cinza', badge:'Termômetro', bc:'tb-e', fmt:'✍️ Texto', ia:'📏 Termômetro', warn:false,
+        title:'Termômetro: o quanto o banco te preocupa hoje?',
+        caption:'"Arrasta e me conta. Sem julgamento."',
+        roteiro:'Barra deslizante. 😌 (Nada) → 😰 (Não consigo dormir). "Sendo honesto: o quanto a sua dívida bancária rural te tira o sono?" Quem marcar alto recebe DM: "Vi que o banco te preocupa bastante. Posso te ajudar a entender suas opções jurídicas. Sem compromisso."',
+        els:[{l:'Elemento IG',v:'Barra deslizante'},{l:'Ação',v:'DM para quem marcar acima de 70%'},{l:'Tom',v:'Empático'},{l:'Objetivo',v:'Abrir DMs qualificados'}],
+        cta:'DM direto para quem demonstrou preocupação alta.'},
+      { n:'—', bar:'bg-dark', badge:'CTA', bc:'tb-cta', fmt:'✍️ Texto', ia:'🌾 Reação Emoji', warn:false,
+        title:'Guia gratuito: "Meus juros estão corretos?"',
+        caption:'"Reaja com 🌾 e eu te mando um checklist gratuito no direct."',
+        roteiro:'Story escuro com texto grande. Barra de reação emoji 🌾. "Você tem dúvida se os juros do seu financiamento estão dentro do que a lei permite?" Para quem reagir: enviar checklist simples via DM com os 5 principais pontos para identificar irregularidades em contratos bancários.',
+        els:[{l:'Elemento IG',v:'Barra de reação emoji (🌾)'},{l:'Ação',v:'DM com checklist para quem reagiu'},{l:'Fundo',v:'Verde profundo, texto grande'},{l:'Urgência',v:'Opcional: "Só hoje"'}],
+        cta:'🌾 Reação → checklist gratuito no direct.'}
+    ]},
+    { pill:'Dia 14 · Domingo', theme:'Depoimento de cliente — prova social', stories:[
+      { n:'14', bar:'bg-verde', badge:'Depoimento', bc:'tb-dep', fmt:'📸 Foto (print) ou 🎬 Vídeo', ia:null, warn:false,
+        title:'Depoimento real: produtor que conseguiu reverter execução bancária',
+        caption:'"\'Eu achei que ia perder tudo. O escritório mostrou que eu estava pagando quase o dobro do que devia — e conseguimos suspender o processo.\'"',
+        roteiro:'Print de mensagem de WhatsApp ou DM de cliente satisfeito, com nome e foto completamente cobertos. Identificado como "Produtor rural, [estado]." Se possível e autorizado: vídeo curto do cliente falando sobre a experiência (pode usar voz apenas, sem mostrar rosto, com autorização expressa). Destacar com caneta IG a frase mais impactante sobre a redução da dívida ou suspensão da execução.',
+        els:[{l:'Privacidade',v:'Nome e foto sempre cobertos'},{l:'Identificação',v:'"Produtor rural, [cidade/estado]"'},{l:'Destaque',v:'Sublinhar a frase mais forte'},{l:'Opcional',v:'Vídeo do cliente com autorização prévia'}],
+        cta:'"Esse resultado está disponível para você. Me chama no direct."'}
+    ]}
+  ]},
+  { label:'Semana 3', sub:'Dias 15–21 · Dívida Bancária & Defesa do Produtor', days:[
+    { pill:'Dia 15 · Segunda', theme:'A ameaça do banco ao patrimônio', stories:[
+      { n:'15', bar:'bg-ouro', badge:'Vídeo', bc:'tb-v', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Como o banco pode tomar sua terra sem que você perceba',
+        caption:'"Muita gente acha que só perde o bem se deixar de pagar o financiamento. Não é bem assim."',
+        roteiro:'Vídeo de 25 segundos. Tom sério e educativo. "Mesmo pagando parte do financiamento, uma dívida vencida junto com juros mal calculados pode resultar em execução e penhora da fazenda." Pausa. "Quando o patrimônio está exposto, ele está vulnerável. A análise contratual e a defesa jurídica ativa são o que protege a terra."',
+        els:[{l:'Formato',v:'Vídeo câmera fixa'},{l:'Tom',v:'Educativo, sério, sem exagero'},{l:'Conceito',v:'Exposição patrimonial x defesa jurídica'},{l:'Duração',v:'25 segundos'}],
+        cta:'↓ Amanhã: resposta da caixinha sobre dívida bancária ↓'}
+    ]},
+    { pill:'Dia 16 · Terça', theme:'Resposta de caixinha: dívida rural', stories:[
+      { n:'16', bar:'bg-verde', badge:'Resposta', bc:'tb-r', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Resposta da caixinha: "Tenho dívida no banco — posso perder a fazenda?"',
+        caption:'"Depende. E essa resposta pode mudar tudo."',
+        roteiro:'Exibir a pergunta. Resposta em vídeo de 30 segundos. Três cenários: 1) Dívida com garantia hipotecária da terra — risco real, mas há defesas processuais. 2) Dívida pessoal sem garantia — existem limites legais para alcançar bens rurais. 3) Contrato com juros abusivos — há revisão judicial que pode reduzir o saldo. Final: "Cada caso é diferente. Mas você tem mais opções do que o banco te diz."',
+        els:[{l:'Formato',v:'Screenshot da pergunta + vídeo resposta'},{l:'Tom',v:'Técnico mas acessível'},{l:'Estrutura',v:'3 cenários práticos'},{l:'Final',v:'Esperança + convite para conversa'}],
+        cta:'"Me conta o seu caso no direct. Vejo o que é possível."'}
+    ]},
+    { pill:'Dia 17 · Quarta', theme:'Notícia da semana — validar com jurídico, sem ITCMD', stories:[
+      { n:'17', bar:'bg-news', badge:'Notícia', bc:'tb-n', fmt:'🔄 Repost', ia:null, warn:true,
+        title:'Notícia da Semana: crédito rural ou novas regras de financiamento',
+        caption:'"Isso saiu essa semana e afeta diretamente quem tem financiamento rural ativo."',
+        roteiro:'⚠️ VALIDAR COPY COM EQUIPE JURÍDICA antes de publicar. Repost de notícia real sobre crédito rural, Pronaf, dívida rural, ou financiamento bancário. Caneta IG sublinhar. Texto sobreposto com implicação prática em 2 linhas. Tom protetor. NÃO mencionar ITCMD nessa semana.',
+        els:[{l:'⚠️ Atenção',v:'Validar copy com jurídico — NÃO mencionar ITCMD'},{l:'Fonte',v:'Canal Rural, CNA, Ministério da Agricultura'},{l:'Formato',v:'Repost + texto + caneta'},{l:'Tom',v:'Informativo e protetor'}],
+        cta:'"Salva e manda pro grupo do seu sindicato rural."'}
+    ]},
+    { pill:'Dia 18 · Quinta', theme:'Humor', stories:[
+      { n:'18', bar:'bg-humor', badge:'Humor', bc:'tb-h', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Quando o cliente aparece na reunião de terno e eu conheço ele só de bota',
+        caption:'"Ele trocou a bota pelo terno para falar com o advogado. Mas eu já sei que em casa ele tá descalço."',
+        roteiro:'Vídeo leve. O advogado conta como é engraçado quando o produtor rural vem formalizado à reunião. Pode terminar com: "Pode vir de bota, sapatão ou tênis. O que importa é proteger o que você construiu."',
+        els:[{l:'Formato',v:'Vídeo selfie, descontraído'},{l:'Tom',v:'Carinhoso, não irônico'},{l:'Final',v:'Mensagem de acolhimento real'},{l:'Identificação',v:'Produtor rural vai se reconhecer'}],
+        cta:'"Manda pra aquele produtor que aparece na reunião todo enfeitado."'}
+    ]},
+    { pill:'Dia 19 · Sexta', theme:'Bastidor', stories:[
+      { n:'19', bar:'bg-terra', badge:'Campo', bc:'tb-f', fmt:'📸 Foto ou 🎬 Vídeo', ia:null, warn:false,
+        title:'Bastidor: na estrada para visita ou análise de contrato',
+        caption:'"Hoje é dia de campo. Porque entender a situação real é o primeiro passo para defender."',
+        roteiro:'Foto ou vídeo na estrada ou na propriedade. Natural. Sem pose. Se não houver visita: substituir por foto da janela do carro indo a reunião com cliente rural, ou de um contrato de financiamento sendo analisado (com dados cobertos).',
+        els:[{l:'Condição',v:'Visita real ou reunião com produtor'},{l:'Substituição',v:'Contrato ou documento bancário se não houver campo'},{l:'Tom',v:'Autêntico acima de qualquer coisa'},{l:'Legenda',v:'Curta e real'}],
+        cta:'↓ Fim de semana: enquete juros abusivos ↓'}
+    ]},
+    { pill:'Dia 20 · Sábado', theme:'Enquete — juros abusivos + CTA', stories:[
+      { n:'20', bar:'bg-cinza', badge:'Enquete', bc:'tb-e', fmt:'✍️ Texto', ia:'📊 Enquete', warn:false,
+        title:'Você já calculou se os juros do seu contrato estão corretos?',
+        caption:'"Sim, conferi em detalhe / Nunca analisei com profundidade"',
+        roteiro:'"Você já parou para conferir se os juros que o banco cobra no seu financiamento estão de acordo com o que foi contratado?" Quem responder "nunca analisei" → DM: "Você não está sozinho. Me manda o tipo de contrato que você tem — eu te explico o que olhar." Quem responder "sim, conferi" → DM: "Ótimo. Se quiser uma segunda opinião, estou aqui."',
+        els:[{l:'Elemento IG',v:'Enquete 2 opções'},{l:'Ação opção 1',v:'DM consultivo'},{l:'Ação opção 2',v:'DM de orientação'},{l:'Tom',v:'Empático e respeitoso'}],
+        cta:'Qualquer resposta abre conversa no DM.'},
+      { n:'—', bar:'bg-cinza', badge:'Enquete', bc:'tb-e', fmt:'✍️ Texto', ia:'📊 Enquete', warn:false,
+        title:'Você já pagou juros que o banco não soube te explicar direito?',
+        caption:'"Isso acontece mais do que você imagina. Responde a enquete e me conta."',
+        roteiro:'Story de fundo escuro. Texto grande. "Se você chegou até aqui nessa semana, você já entendeu que juros mal calculados podem estar inflando a sua dívida." Pausa. Enquete: "Você já questionou os juros do seu contrato bancário? / Nunca parei para verificar." Tom: identificação, sem pressão. Quem responder "nunca verifiquei" recebe DM empático.',
+        els:[{l:'Elemento IG',v:'Enquete 2 opções'},{l:'Tom',v:'Identificação, sem pressão'},{l:'Fundo',v:'Verde profundo, texto grande'},{l:'Objetivo',v:'Engajamento e abertura de DMs'}],
+        cta:'"Comenta aqui JUROS se você quer que eu aprofunde mais esse tema no próximo mês."'}
+    ]},
+    { pill:'Dia 21 · Domingo', theme:'Humanização rural', stories:[
+      { n:'21', bar:'bg-humor', badge:'Foto', bc:'tb-f', fmt:'📸 Foto', ia:null, warn:false,
+        title:'Domingo rural: o dia que lembro de onde vim',
+        caption:'"Todo domingo tem um cheiro de terra. Mesmo quando estou na cidade."',
+        roteiro:'Foto pessoal com forte sentimento de raiz. Campo da família, visita à propriedade dos pais, ou lembrança de infância rural. A autenticidade dessa humanização é o que diferencia o Queiroz Associados.',
+        els:[{l:'Formato',v:'Foto pessoal — família ou campo'},{l:'Tom',v:'Nostálgico e com propósito'},{l:'Sem',v:'CTA de produto — puro humanização'},{l:'Objetivo',v:'Fidelização emocional do seguidor'}],
+        cta:'Sem CTA — esse story planta confiança a longo prazo.'}
+    ]}
+  ]},
+  { label:'Semana 4', sub:'Dias 22–28 · Dívidas, Penhoras & Bloqueios Bancários', days:[
+    { pill:'Dia 22 · Segunda', theme:'Bloqueio bancário e penhora de bens', stories:[
+      { n:'22', bar:'bg-ouro', badge:'Vídeo', bc:'tb-v', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Bloqueio judicial na sua conta: você sabe o que fazer nas próximas horas?',
+        caption:'"Um bloqueio bancário pode paralisar toda a operação da fazenda. Mas há uma janela jurídica para agir."',
+        roteiro:'Vídeo de 25 segundos. "Você chega no banco ou vai fazer um pagamento e descobre que a conta está bloqueada por ordem judicial. Esse é um dos momentos de maior pânico para qualquer produtor." Pausa. "Mas existe um caminho jurídico: pedido de desbloqueio, contestação da penhora, e em muitos casos, suspensão liminar da execução. O prazo para agir é curto. Mas existe saída — se você agir rápido."',
+        els:[{l:'Formato',v:'Vídeo câmera fixa'},{l:'Tom',v:'Urgente, educativo, sem alarmismo'},{l:'Conceito',v:'Bloqueio judicial x instrumentos de defesa'},{l:'Duração',v:'25 segundos'}],
+        cta:'↓ Amanhã: resposta da caixinha sobre execução e penhora ↓'}
+    ]},
+    { pill:'Dia 23 · Terça', theme:'Resposta da caixinha: execução e penhora', stories:[
+      { n:'23', bar:'bg-verde', badge:'Resposta', bc:'tb-r', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Resposta da caixinha: "Meu banco ameaçou executar o contrato — o que eu faço agora?"',
+        caption:'"Primeiro: não entre em pânico. Segundo: não vá ao banco sem orientação jurídica."',
+        roteiro:'Exibir pergunta. Vídeo de 30 segundos. Três passos: 1) Não assine nada nem faça acordo direto com o banco sem consultar advogado — qualquer reconhecimento espontâneo pode prejudicar sua defesa. 2) Reúna toda a documentação: contrato, aditivos, extratos, boletos pagos. 3) Busque análise jurídica especializada — há prazos processuais curtos que não esperam. "Execução bancária tem instrumentos de defesa específicos: embargos, exceção de pré-executividade, revisão contratual. Mas precisam ser usados no momento certo."',
+        els:[{l:'Formato',v:'Screenshot da pergunta + vídeo resposta'},{l:'Tom',v:'Técnico mas acessível'},{l:'Estrutura',v:'3 passos práticos e urgentes'},{l:'Final',v:'Instrumentos jurídicos disponíveis'}],
+        cta:'"Se você está nessa situação agora, me chama no direct. Tem prazo."'}
+    ]},
+    { pill:'Dia 24 · Quarta', theme:'Notícia da semana — dívidas/execuções', stories:[
+      { n:'24', bar:'bg-news', badge:'Notícia', bc:'tb-n', fmt:'🔄 Repost', ia:null, warn:false,
+        title:'Notícia da Semana: execuções bancárias ou reestruturação de dívidas rurais',
+        caption:'"O que essa movimentação significa para quem tem dívida ativa com o banco?"',
+        roteiro:'Notícia real sobre execuções bancárias, reestruturação de dívidas rurais, Pronaf, ou legislação sobre financiamento. Repost com caneta e texto sobreposto. Finalizar com perspectiva de ação: "O que você pode fazer hoje com essa informação." Sempre fechar com ação, nunca desamparo.',
+        els:[{l:'Fonte',v:'Valor Econômico, CNA, Globo Rural'},{l:'Foco',v:'Implicação prática para o produtor endividado'},{l:'Tom',v:'"Você tem opções"'},{l:'Ação',v:'Sempre fechar com o que fazer'}],
+        cta:'"Salva e comenta o que achou."'}
+    ]},
+    { pill:'Dia 25 · Quinta', theme:'Humor', stories:[
+      { n:'25', bar:'bg-humor', badge:'Humor', bc:'tb-h', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Quando minha mãe pergunta o que eu faço',
+        caption:'"Mãe: \'Mas você defende caloteiro?\' Eu: \'Mãe, eu defendo seu patrimônio.\'"',
+        roteiro:'Vídeo leve e carinhoso. O advogado narra a clássica situação de tentar explicar o trabalho jurídico para os pais ou avós criados no campo. A família muitas vezes confunde "advogado que defende devedor" com defender quem errou — mas o papel é defender o direito a um processo justo e juros corretos.',
+        els:[{l:'Formato',v:'Vídeo narrativo leve'},{l:'Tom',v:'Carinhoso, nunca pejorativo'},{l:'Identificação',v:'Universal para filhos de família rural'},{l:'Objetivo',v:'Compartilhamento orgânico alto'}],
+        cta:'"Manda pra aquele familiar que ainda não entende exatamente o que você faz."'}
+    ]},
+    { pill:'Dia 26 · Sexta', theme:'Bastidor — visita à propriedade', stories:[
+      { n:'26', bar:'bg-terra', badge:'Campo', bc:'tb-f', fmt:'📸 Foto ou 🎬 Vídeo', ia:null, warn:false,
+        title:'Bastidor: visita a propriedade rural para análise de documentação',
+        caption:'"Antes de qualquer estratégia jurídica, eu preciso ver a terra."',
+        roteiro:'Foto ou vídeo de visita real à propriedade de cliente. Porteira, horizonte, área demarcada. Narração: "Hoje estou aqui para entender a realidade dessa propriedade antes de propor qualquer solução jurídica." SOMENTE quando houver visita real.',
+        els:[{l:'Condição',v:'SOMENTE em visita real ao campo'},{l:'Privacidade',v:'Não identificar o cliente'},{l:'Tom',v:'Profissional + humano'},{l:'Narração',v:'Opcional — a imagem já diz muito'}],
+        cta:'↓ Sábado: prova social + CTA de encerramento ↓'}
+    ]},
+    { pill:'Dia 27 · Sábado', theme:'Prova social', stories:[
+      { n:'27', bar:'bg-verde', badge:'Repost', bc:'tb-r', fmt:'📸 Foto (print)', ia:null, warn:false,
+        title:'Resultado real: depoimento de cliente produtor rural (anonimizado)',
+        caption:'"Resultado real. Cliente real. A identidade é preservada — a história não."',
+        roteiro:'Print de mensagem de WhatsApp ou DM de cliente satisfeito, com nome e foto completamente cobertos. Identificado como "Produtor rural, interior do [estado]." Sublinhar ou destacar a frase mais impactante. Sem narração elaborada — o texto do cliente fala mais que qualquer vídeo.',
+        els:[{l:'Privacidade',v:'Nome e foto sempre cobertos'},{l:'Identificação',v:'"Produtor rural, [cidade/estado]"'},{l:'Destaque',v:'Sublinhar a frase mais forte'},{l:'Tom',v:'Deixar o cliente falar'}],
+        cta:'"Esse resultado está disponível para você. Me chama."'}
+    ]},
+    { pill:'Dia 28 · Domingo', theme:'Reflexão de fechamento', stories:[
+      { n:'28', bar:'bg-humor', badge:'Foto', bc:'tb-f', fmt:'📸 Foto', ia:null, warn:false,
+        title:'Domingo de reflexão: o que me motivou essa semana',
+        caption:'"Cada caso que encerro bem é uma família que vai dormir mais tranquila. Isso é o suficiente."',
+        roteiro:'Foto pessoal ou reflexão escrita. Pode ser uma mensagem que chegou de um cliente, uma cena da fazenda ou uma frase na tela. Objetivo: mostrar propósito, não técnica.',
+        els:[{l:'Formato',v:'Foto pessoal ou story de texto'},{l:'Tom',v:'Reflexivo, com propósito'},{l:'Sem',v:'Nenhum CTA de produto'},{l:'Objetivo',v:'Humanização + fidelização de longo prazo'}],
+        cta:'Sem CTA — o propósito demonstrado aqui vende mais do que qualquer pitch.'}
+    ]}
+  ]},
+  { label:'Dias 29–30', sub:'Encerramento do mês', days:[
+    { pill:'Dia 29 · Segunda', theme:'Resumo do mês', stories:[
+      { n:'29', bar:'bg-verde', badge:'Vídeo', bc:'tb-v', fmt:'🎬 Vídeo', ia:null, warn:false,
+        title:'Resumo do mês: o que aprendemos juntos sobre proteção bancária',
+        caption:'"30 dias. Muita coisa dita. O resumo do que realmente importa."',
+        roteiro:'Vídeo de 30–40 segundos. Balanço humano do mês. "Esse mês vocês me mandaram mais de [X] perguntas. E a mais comum foi: tenho dívida com o banco, o que faço?" Resposta: "Você tem mais direitos do que imagina. E quanto antes age, mais opções tem."',
+        els:[{l:'Formato',v:'Vídeo selfie, tom de encerramento'},{l:'Tom',v:'Grato, reflexivo, motivador'},{l:'Dados',v:'Citar número de perguntas recebidas'},{l:'Duração',v:'30–40 segundos'}],
+        cta:'↓ Último story amanhã: caixinha do próximo mês ↓'},
+      { n:'—', bar:'bg-cinza', badge:'Enquete', bc:'tb-e', fmt:'✍️ Texto', ia:'📊 Enquete', warn:false,
+        title:'Qual tema você quer que eu aborde mais no próximo mês?',
+        caption:'"Vocês escolhem. Eu preparo."',
+        roteiro:'Enquete com 4 opções: "Revisão de juros / Prorrogação de dívida / Penhora e bloqueio / Renegociação bancária." Os resultados guiam o planejamento do próximo mês.',
+        els:[{l:'Elemento IG',v:'Enquete com 4 opções'},{l:'Objetivo',v:'Planejamento do próximo mês'},{l:'Tom',v:'"Você escolhe o conteúdo"'},{l:'Benefício',v:'Seguidores se sentem donos do canal'}],
+        cta:'Resultado da enquete vira planejamento do mês seguinte.'}
+    ]},
+    { pill:'Dia 30 · Terça', theme:'Caixinha do próximo mês + CTA final', stories:[
+      { n:'30', bar:'bg-dark', badge:'CTA', bc:'tb-cta', fmt:'✍️ Texto', ia:'💬 Caixinha + 🔗 Link', warn:false,
+        title:'Dia 30: caixinha do próximo mês + convite final',
+        caption:'"Antes de encerrar: o que você ainda não perguntou mas precisa saber?"',
+        roteiro:'Story em dois momentos. Primeiro: caixinha aberta — "Qual pergunta sobre sua situação bancária ou proteção do patrimônio você ainda não fez?" Segundo: texto de encerramento com fundo escuro — "30 dias. Muita conversa. Muito aprendizado." Pausa. "Se em algum momento algo aqui fez sentido para você, a porta está aberta." Link ou DM.',
+        els:[{l:'Parte 1',v:'Caixinha de perguntas abertas'},{l:'Parte 2',v:'Texto de encerramento — fundo escuro'},{l:'Tom',v:'Encerramento com abertura'},{l:'CTA',v:'Link ou DM disponível'}],
+        cta:'DM aberto para todo o mês seguinte.'}
+    ]}
+  ]}
+];
+
+const feedData = [
+  { week:1, n:'01', pilar:'📍 Pé no Barro', pilarClass:'pd', day:'1', dayLabel:'Seg',
+    title:'Quem protege quem alimenta o Brasil',
+    gancho:'"Você sabe o que acontece com o patrimônio da sua família quando você não tem defesa jurídica?"',
+    objetivo:'🤝 Conexão · Seguidor novo',
+    ideia:'Advogada de forma casual se apresenta e explica a missão: proteger o patrimônio de quem alimenta o Brasil, especialmente contra abusos bancários e execuções indevidas no agro.',
+    steps:['INÍCIO — Gancho: pergunta direta sobre o futuro do patrimônio. Câmera próxima.','MEIO — "Meu nome é [Nome do Advogado(a)], da Queiroz Associados. Nós cuidamos da parte que mais assusta o produtor: dívidas bancárias, penhoras, revisão de juros, proteção do patrimônio."','FIM — "Se você tem terra, financiamento e patrimônio, você precisa de um advogado que entenda de campo, não só de papel."'],
+    cta:'Segue aqui — toda semana tem conteúdo que protege o seu.'},
+  { week:1, n:'02', pilar:'🏦 O Bolso', pilarClass:'pb', day:'2', dayLabel:'Ter',
+    title:'Juros abusivos podem estar destruindo anos de trabalho',
+    gancho:'"Em média, 70% dos contratos de financiamento rural têm irregularidades nos juros. O seu pode ser um deles."',
+    objetivo:'⚡ Urgência · Salvamento · Conversão',
+    ideia:'Advogado mostra como juros mal calculados ou cobrados indevidamente inflam a dívida de forma silenciosa. O produtor paga todo mês sem questionar — mas tem direito de exigir uma conta limpa judicialmente.',
+    steps:['INÍCIO — Dado impactante sobre contratos irregulares. Pausa. "Você assinou o contrato e confiou nos números que vieram prontos."','MEIO — "Capitalização não autorizada, seguros embutidos sem transparência, TAC cobrada indevidamente — tudo isso pode estar inflando a sua dívida. E você tem direito de questionar judicialmente."','FIM — "A dívida que parece impossível pode ser menor do que o banco te diz. Mas isso precisa ser verificado antes da execução chegar."'],
+    cta:'Salva esse vídeo e manda pro grupo da sua cooperativa. Pode ser o mais importante da semana.'},
+  { week:1, n:'03', pilar:'🏦 O Bolso', pilarClass:'pb', day:'3', dayLabel:'Qua',
+    title:'Notificação de leilão: O que fazer nas primeiras 24h',
+    gancho:'"Recebeu uma carta do banco sobre leilão da sua terra? Não entre em pânico. Faça isso agora."',
+    objetivo:'🔥 Urgência · Comentário · Conversão direta',
+    ideia:'Vídeo de utilidade extrema. Advogada explica o passo a passo das primeiras 24 horas após receber notificação de leilão: não assine nada, não entre em contato com o banco sem orientação jurídica, guarde todos os documentos.',
+    steps:['INÍCIO — Gancho com situação de pânico real. "Esse momento parece o fim, mas pode não ser."','MEIO — Lista: 1. Não assine nada. 2. Guarde todos os documentos. 3. Não negocie direto com o banco. 4. Busque advogado em até 24h — os prazos processuais são curtos.','FIM — "O banco não é dono da sua terra. Ele é apenas o credor. E há um caminho jurídico antes do leilão que a maioria não conhece."'],
+    cta:'Comenta "TERRA" aqui embaixo — te mando mais informações sobre o que fazer nessa situação.'},
+  { week:1, n:'04', pilar:'🏢 Empresa Rural', pilarClass:'pc', day:'4', dayLabel:'Qui',
+    title:'Sua fazenda é uma empresa, não um quintal',
+    gancho:'"Se você fatura mais de R$300 mil por ano na fazenda e ainda está no CPF, você paga muito mais imposto."',
+    objetivo:'📊 Autoridade · Compartilhamento · Lead',
+    ideia:'Comparativo direto: produtores que operam como Pessoa Física x Pessoa Jurídica. Diferença de carga tributária, exposição patrimonial e vulnerabilidade a execuções bancárias.',
+    steps:['INÍCIO — Gancho com número impactante de imposto.','MEIO — "A fazenda tem maquinário, funcionários, contratos, faturamento. Isso é uma empresa. E empresa precisa de estrutura jurídica para pagar menos e arriscar menos — inclusive frente ao banco."','FIM — 3 vantagens da PJ rural: proteção patrimonial, redução fiscal, blindagem dos ativos operacionais.'],
+    cta:'Manda esse vídeo pro teu contador. Pergunta se você deveria ter uma PJ. Você vai se surpreender.'},
+  { week:1, n:'05', pilar:'🎭 O Tradutor', pilarClass:'pe', day:'5', dayLabel:'Sex',
+    title:'Juridiquês do campo: tradução ao vivo',
+    gancho:'"O advogado disse \'exceção de pré-executividade\'. O produtor escutou: exceção de pré-executividade."',
+    objetivo:'😄 Viralização · Compartilhamento · Alcance',
+    ideia:'Formato: advogado fala o termo técnico → corte → mesmo advogado "traduzindo" em linguagem do produtor. Ex: "Embargo à execução" = "você pede pro juiz revisar a conta do banco antes de penhorar qualquer coisa."',
+    steps:['INÍCIO — Gancho cômico: Advogado fala o termo difícil com voz "de juiz". Corte brusco.','MEIO — Ele aparece com expressão de "deixa eu traduzir" e explica 3 termos bancários com analogias rurais.','FIM — "Juridiquês a gente traduz. A sua terra, a gente protege."'],
+    cta:'Manda pra aquele amigo produtor que nunca entendeu nada do que o advogado falou 😂'},
+  { week:2, n:'06', pilar:'🏦 O Bolso', pilarClass:'pb', day:'6', dayLabel:'Seg',
+    title:'O banco executou — mas você tem direitos que ele não vai te contar',
+    gancho:'"Recebeu notificação de execução bancária? Existe um caminho jurídico antes de perder qualquer bem."',
+    objetivo:'💡 Autoridade · Salvamento · Lead qualificado',
+    ideia:'Explicar os instrumentos jurídicos disponíveis quando o banco inicia processo de execução: exceção de pré-executividade, embargos à execução, revisão contratual, pedido de desbloqueio. O produtor não está desamparado.',
+    steps:['INÍCIO — "Execução bancária não é o fim. É o começo de uma disputa que você tem o direito de travar."','MEIO — Três instrumentos: 1) Revisão de juros durante o processo. 2) Embargos à execução para suspender o rito. 3) Contestação de penhora de bens impenhoráveis.','FIM — "O banco conhece esses instrumentos. Está na hora de você conhecer também."'],
+    cta:'Salva esse vídeo. Quando quiser entender qual instrumento se aplica ao seu caso, é só me chamar.'},
+  { week:2, n:'07', pilar:'🏦 O Bolso', pilarClass:'pb', day:'7', dayLabel:'Ter',
+    title:'Prorrogação e alongamento: o direito que o banco não te conta',
+    gancho:'"Você sabia que existe lei que pode obrigar o banco a reestruturar sua dívida rural antes de executar sua propriedade?"',
+    objetivo:'💾 Salvamento · Conversão · Indignação saudável',
+    ideia:'Revelação de um direito que a maioria dos produtores desconhece: o alongamento e prorrogação de dívida rural. Explicar como funciona, quem tem direito e o que acontece quando o banco tenta executar sem oferecer essa alternativa.',
+    steps:['INÍCIO — Dado ou afirmação que gera indignação imediata.','MEIO — O que é a prorrogação e o alongamento, quando se aplica e por que o banco raramente informa o produtor.','FIM — "O banco tem obrigações que ele prefere que você não conheça. A nossa obrigação é te contar."'],
+    cta:'Comenta "DÍVIDA" aqui se você ou alguém que você conhece está passando por isso.'},
+  { week:2, n:'08', pilar:'📍 Pé no Barro', pilarClass:'pd', day:'8', dayLabel:'Qua',
+    title:'Respondendo: "Posso perder minha terra por dívida bancária?"',
+    gancho:'"Me perguntaram isso semana passada. A resposta não é sim nem não — e isso muda tudo."',
+    objetivo:'💬 Engajamento · Conexão · Comentário',
+    ideia:'Formato Q&A direto. Advogado responde uma dúvida real de forma casual, como se estivesse conversando com o produtor pessoalmente. Naturalidade é o ponto forte desse pilar.',
+    steps:['INÍCIO — "Alguém me perguntou isso aqui nos comentários" [mostra ou cita].','MEIO — Resposta direta, linguagem simples. Usa analogia do campo para o ponto jurídico central. Menciona instrumentos de defesa disponíveis.','FIM — "Qualquer outra dúvida, joga aqui nos comentários. Leio tudo."'],
+    cta:'Qual a sua maior dúvida sobre dívida bancária rural? Comenta aqui — próximo vídeo pode ser a sua resposta.'},
+  { week:2, n:'09', pilar:'🏢 Empresa Rural', pilarClass:'pc', day:'9', dayLabel:'Qui',
+    title:'PJ x CPF: você paga mais do que deveria e fica mais exposto ao banco',
+    gancho:'"Todo ano na declaração, seu contador trabalha. Mas ele te disse quanto você economizaria com uma estrutura empresarial rural?"',
+    objetivo:'📊 Autoridade · Compartilhamento · Lead',
+    ideia:'Comparativo objetivo: produtor operando como PF x produtor com estrutura PJ. Diferença na exposição tributária e, especialmente, na vulnerabilidade a execuções bancárias quando o patrimônio está todo no CPF.',
+    steps:['INÍCIO — Pergunta sobre contador + silêncio que gera reflexão.','MEIO — "Estrutura empresarial rural é decisão jurídica, não só contábil. Os benefícios: menor carga fiscal, separação do patrimônio pessoal e maior proteção frente a execuções bancárias."','FIM — "Se sua fazenda fatura mais de R$500 mil por ano, você provavelmente já deveria ter essa conversa."'],
+    cta:'Manda esse vídeo pro seu contador agora. Pergunta se a sua estrutura está protegendo o patrimônio.'},
+  { week:2, n:'10', pilar:'🏦 O Bolso', pilarClass:'pb', day:'10', dayLabel:'Sex',
+    title:'Capitalização de juros: o erro no contrato que você provavelmente nunca detectou',
+    gancho:'"Sabia que juros sobre juros não autorizados em contrato bancário podem ser anulados na justiça — e reduzir sua dívida em até 30%?"',
+    objetivo:'⚡ Urgência · Comentário · Conversão',
+    ideia:'Explicar de forma simples o que é capitalização de juros (juros sobre juros), quando é ilegal, e como identificar no extrato bancário. Usar exemplo numérico simples para mostrar o impacto real na dívida.',
+    steps:['INÍCIO — Afirmação com dado de impacto. "Deixa eu explicar o que pode estar acontecendo na sua planilha bancária."','MEIO — "O banco cobra juros no mês e no mês seguinte cobra juros sobre o valor que já tinha juros embutidos. Quando não está previsto em contrato ou viola limites legais, é anulável." Exemplo numérico simples.','FIM — "Uma análise do seu contrato pode mudar o valor que você realmente deve."'],
+    cta:'Salva e manda pro grupo. Essa informação pode mudar uma decisão financeira importante.'},
+  { week:3, n:'11', pilar:'🏦 O Bolso', pilarClass:'pb', day:'11', dayLabel:'Seg',
+    title:'Seguro agrícola: venda casada que o banco não quer que você saiba',
+    gancho:'"O banco condicionou seu financiamento à contratação de um seguro específico? Isso pode ser ilegal."',
+    objetivo:'😤 Indignação · Comentário · Compartilhamento',
+    ideia:'A prática de venda casada nos financiamentos rurais — quando o banco exige a contratação de seguros como condição para liberar o crédito. Isso é proibido pelo CDC e pode ser revertido judicialmente.',
+    steps:['INÍCIO — Pergunta direta que ativa memória ruim: "o banco te forçou a contratar algo para liberar seu crédito?"','MEIO — Definir venda casada, mostrar que é prática ilegal e explicar como buscar ressarcimento + cancelamento do produto imposto.','FIM — "Banco não é beneficente. Mas também não pode te obrigar a nada."'],
+    cta:'Comenta "BANCO" aqui se isso já aconteceu com você. A gente vai te orientar gratuitamente.'},
+  { week:3, n:'12', pilar:'🎭 O Tradutor', pilarClass:'pe', day:'12', dayLabel:'Ter',
+    title:'Contrato de boca vs. papel assinado',
+    gancho:'"\'A gente combinou assim\' não vale nada no tribunal. Sinto muito."',
+    objetivo:'😂 Identificação · Compartilhamento · Alcance',
+    ideia:'Humor: situação cômica de contrato de arrendamento "no fio do bigode" que vira processo de 10 anos. A graça está na identificação — todo produtor conhece alguém que viveu isso.',
+    steps:['INÍCIO — Gancho direto. Pausa. "Essa história todo produtor conhece alguém que viveu."','MEIO — Narrativa leve do caso genérico: custo de resolver vs. custo de um contrato bem feito.','FIM — "Contrato de boca é começo de processo de 10 anos e fim de amizade de 30."'],
+    cta:'Marca aquele amigo que ainda faz negócio no aperto de mão 😂 (com carinho, claro).'},
+  { week:3, n:'13', pilar:'🏢 Empresa Rural', pilarClass:'pc', day:'13', dayLabel:'Qua',
+    title:'Blindagem do maquinário contra dívidas e penhoras bancárias',
+    gancho:'"Uma execução bancária pode chegar no seu trator, na sua colheitadeira — mesmo que você ainda esteja produzindo."',
+    objetivo:'💾 Salvamento · Autoridade · Conversão',
+    ideia:'Bens operacionais (tratores, colheitadeiras, implementos) podem ser penhorados em execuções bancárias se não protegidos por estrutura jurídica adequada. A organização empresarial protege o operacional da fazenda.',
+    steps:['INÍCIO — Dado perturbador: valor de uma colheitadeira x risco de penhora bancária.','MEIO — Cenário: banco executa contrato, juiz autoriza penhora do maquinário. Colheita para. Prejuízo em cadeia. Como evitar com estrutura jurídica.','FIM — "Blindagem de maquinário não é paranoia. É gestão."'],
+    cta:'Salva esse. Se você tem financiamento bancário e maquinário de alto valor, esse conteúdo é direto pra você.'},
+  { week:3, n:'14', pilar:'📍 Pé no Barro', pilarClass:'pd', day:'14', dayLabel:'Qui',
+    title:'O que é "embargo à execução" em 30 segundos',
+    gancho:'"O banco iniciou a execução. Seu advogado falou em embargo. Você sabe o que isso significa na prática?"',
+    objetivo:'💾 Salvamento · Glossário · Autoridade',
+    ideia:'Explicação simples de um instrumento jurídico crucial: o embargo à execução. Analogia direta: "é você pedir pro juiz revisar a conta do banco inteira antes de penhorar qualquer coisa."',
+    steps:['INÍCIO — Cenário de ameaça real: banco executa, advogado fala em embargo.','MEIO — O que é o embargo, como funciona, qual o prazo para entrar com ele e por que agir rápido importa.','FIM — "Esse instrumento pode suspender a execução enquanto os juros são revisados. Agora você sabe o que pedir."'],
+    cta:'Salva esse. Você pode precisar dele um dia — ou pode salvar alguém que está precisando agora.'},
+  { week:3, n:'15', pilar:'🏦 O Bolso', pilarClass:'pb', day:'15', dayLabel:'Sex',
+    title:'Penhora de trator: quando o banco vai atrás do seu maquinário',
+    gancho:'"Uma execução bancária pode chegar no seu trator durante a colheita. E há bens que o banco não pode penhorar."',
+    objetivo:'💬 Comentário · Identificação · Urgência',
+    ideia:'Abordar a penhora de bens em execuções bancárias rurais. O produtor não sabe quais bens são impenhoráveis por lei. Explicar o que pode e o que não pode ser penhorado, e como contestar dentro do prazo.',
+    steps:['INÍCIO — Cenário de pânico real: o oficial de justiça chega na fazenda para penhorar o trator na véspera da colheita.','MEIO — "Nem tudo pode ser penhorado. Bens com proteção legal incluem instrumentos essenciais de trabalho e maquinário indispensável para a subsistência. Mas essas defesas precisam ser alegadas no prazo certo."','FIM — "Conhecer seus direitos antes de precisar deles é o que separa quem perde o bem de quem defende o patrimônio."'],
+    cta:'Comenta aqui: você já passou por uma situação de ameaça de penhora ou execução bancária?'},
+  { week:4, n:'16', pilar:'🏢 Empresa Rural', pilarClass:'pc', day:'16', dayLabel:'Seg',
+    title:'Misturou a conta da casa com a conta da colheita?',
+    gancho:'"Se você paga conta de luz da casa pelo CNPJ da fazenda, você está criando um risco jurídico que o banco pode usar contra você."',
+    objetivo:'📊 Compartilhamento · Autoridade · Lead',
+    ideia:'A confusão patrimonial — quando pessoa física e jurídica se misturam nos registros — gera desconsideração da personalidade jurídica, permitindo que credores (incluindo bancos) atinjam bens pessoais.',
+    steps:['INÍCIO — Situação cotidiana de mistura de contas + revelação do risco que ela esconde.','MEIO — "Desconsideração da personalidade jurídica" em linguagem de campo: "o juiz tira a casca da empresa e vai atrás do que é seu pessoalmente — inclusive pra saldar dívida bancária da fazenda."','FIM — "Separar as contas não é burocracia. É o que mantém sua casa fora da execução bancária."'],
+    cta:'Manda pro seu contador e pergunta se as contas estão separadas corretamente.'},
+  { week:4, n:'17', pilar:'🏦 O Bolso', pilarClass:'pb', day:'17', dayLabel:'Ter',
+    title:'Diesel caro não é só custo: é risco jurídico nos contratos',
+    gancho:'"Diesel caro não é só prejuízo no posto. Pode invalidar um contrato de safra que você já assinou."',
+    objetivo:'🌐 Relevância atual · Autoridade · Salvamento',
+    ideia:'Conectar a pauta econômica ao impacto jurídico nos contratos de entrega de safra e transporte. Cláusula de força maior, revisão contratual por onerosidade excessiva.',
+    steps:['INÍCIO — Notícia real da alta do diesel + "Isso tem impacto jurídico que você precisa saber."','MEIO — Contratos assinados com preços defasados podem ser revistos por onerosidade excessiva. Quando e como aplicar.','FIM — "O escritório que entende de agro está de olho no mercado por você."'],
+    cta:'Salva esse. Se você tem contratos de safra assinados, talvez valha revisar antes da colheita.'},
+  { week:4, n:'18', pilar:'📍 Pé no Barro', pilarClass:'pd', day:'18', dayLabel:'Qua',
+    title:'Bastidores: como foi atender esse caso hoje',
+    gancho:'"Hoje eu atendi um produtor que estava prestes a assinar um acordo com o banco que ia comprometer a propriedade por 20 anos."',
+    objetivo:'🤝 Conexão · Confiança · Prova social',
+    ideia:'Bastidores reais (sem identificar o cliente). Advogado conta brevemente um caso — produtor estava prestes a assinar acordo desfavorável com banco. Análise identificou juros cobrados acima do contratado.',
+    steps:['INÍCIO — Hook de bastidor: "antes de terminar o dia, preciso contar uma coisa que aconteceu aqui."','MEIO — Narrativa do caso (sem nomes): produtor estava prestes a assinar acordo com banco. Análise identificou capitalização indevida e juros cobrados acima do contratado.','FIM — "Isso acontece todos os dias. Um documento mal interpretado pode custar anos de trabalho."'],
+    cta:'Se você tem um acordo ou contrato bancário pra revisar antes de assinar, me chama.'},
+  { week:4, n:'19', pilar:'🎭 O Tradutor', pilarClass:'pe', day:'19', dayLabel:'Qui',
+    title:'Arrendamento no fio do bigode',
+    gancho:'"\'A gente é conhecido há 20 anos, não precisa de papel.\' — disse ele, 5 anos antes do processo."',
+    objetivo:'😂 Viralização · Compartilhamento · Engajamento',
+    ideia:'Mini-novela curta. Contrato de arrendamento verbal que virou processo de retomada de terra de 5 anos. Termina com Anderson: "eu não faço milagre, mas faço contrato."',
+    steps:['INÍCIO — Citar a frase clássica + pausa dramática. "Spoiler: eles não são mais conhecidos."','MEIO — Mini narrativa dos 5 anos de processo: testemunhos contraditórios, custos, desgaste familiar.','FIM — "Contrato não desconfia do vizinho. Contrato protege os dois."'],
+    cta:'Marca aqui quem você conhece que ainda faz arrendamento no fio do bigode 😄'},
+  { week:4, n:'20', pilar:'🏦 O Bolso — CTA Final', pilarClass:'pb', day:'20', dayLabel:'Sex',
+    title:'Você trabalhou anos para isso. Não deixe o banco levar.',
+    gancho:'"Seu pai trabalhou. Você continuou. O que você está fazendo para proteger o patrimônio que ninguém tem o direito de tomar?"',
+    objetivo:'🎯 Conversão · Lead direto · Agendamento',
+    ideia:'Vídeo de fechamento do mês com emoção + CTA direto. Revisão de tudo abordado: juros abusivos, execuções, penhoras, bloqueios, revisão contratual. Convite para o próximo passo.',
+    steps:['INÍCIO — Pergunta emocional que ativa o trabalho construído pela família.','MEIO — "Esse mês a gente falou sobre juros abusivos, execução bancária, penhora, bloqueio de conta. Cada um desses temas pode ser o problema que você ainda não sabe que tem."','FIM — CTA claro: "Clica no link da bio e agende uma conversa. A primeira orientação é nossa."'],
+    cta:'Link na bio → Agende uma conversa gratuita. O patrimônio da sua família merece sua atenção.'}
+];
+
+const pilaresData = [
+  { cls:'pa', icon:'🏦', nome:'Pilar A — O Bolso', sub:'Direito Bancário · Juros · Penhora · Execução',
+    obj:'Posicionar o escritório como aliado do produtor contra abusos bancários. Gera indignação saudável, comentários e salvamentos por ser extremamente útil e imediato.',
+    tipo:'Utilidade imediata. "O que você não sabia que tinha direito." Conecta notícias econômicas ao cotidiano jurídico do produtor. Revisão de juros, prorrogação, alongamento, contestação de penhora.',
+    dor:'"O banco é o sócio que mais cobra e menos explica." Risco de perder a terra ou o maquinário por dívida que poderia ser reduzida com a revisão contratual certa.',
+    tags:['Juros Abusivos','Prorrogação','Alongamento','Penhora','Execução','Bloqueio Bancário','Revisão Contratual']},
+  { cls:'pb', icon:'🌾', nome:'Pilar B — O Legado', sub:'Proteção Patrimonial & Continuidade da Fazenda',
+    obj:'Ativar o gatilho de proteção do que foi construído por gerações. É o pilar mais emocional — não herança, mas a continuidade operacional da fazenda contra dívidas e execuções.',
+    tipo:'Educativo com carga emocional. Histórias reais (sem identificação), dados, cenários de risco concretos. O foco é a proteção da terra e da operação, não a sucessão.',
+    dor:'"Trabalhei a vida toda nisso. Não posso deixar o banco levar." O medo de que uma dívida bancária mal administrada destrua o que levou décadas para construir.',
+    tags:['Proteção Patrimonial','Continuidade','Terra','Maquinário','Defesa','Patrimônio']},
+  { cls:'pc', icon:'🏢', nome:'Pilar C — Empresa Rural', sub:'Estruturação Empresarial e Proteção Fiscal',
+    obj:'Mostrar que a fazenda precisa funcionar como empresa para pagar menos imposto e ficar mais protegida contra execuções bancárias. Atrai o produtor mais estratégico.',
+    tipo:'Educativo-prático. Comparativos PF x PJ, separação patrimonial, proteção do maquinário. Alto potencial de salvamento.',
+    dor:'"Você paga mais imposto do que deveria e ainda fica vulnerável a qualquer execução." A desorganização empresarial custa caro — financeira e juridicamente.',
+    tags:['PJ x CPF','Separação Patrimonial','Blindagem','Maquinário','Gestão','Autoridade']},
+  { cls:'pd', icon:'📍', nome:'Pilar D — Pé no Barro', sub:'Humanização · Bastidores · Conexão',
+    obj:'Quebrar a frieza do "terno de advogado". Mostrar que o Advogado entende de terra e de banco, não só de papel. Cria lealdade e confiança de longo prazo.',
+    tipo:'Casual e direto. Bastidores, perguntas respondidas, termos jurídicos bancários explicados com analogias do campo. Sem script engessado.',
+    dor:'"Advogado fala difícil e não me entende." A conexão humana é o que converte quem já consome conteúdo mas ainda não confia o suficiente.',
+    tags:['Humanização','Bastidores','Empatia','Q&A','Glossário','Confiança']},
+  { cls:'pe', icon:'🎭', nome:'Pilar E — O Tradutor do Campo', sub:'Humor Sutil · Viralização · "Quebra do Terno"',
+    obj:'Viralizar. Alcançar novos públicos através do compartilhamento espontâneo. O humor sutil do agro tem alto potencial de "me identifiquei totalmente".',
+    tipo:'Formato de personagem ou situação cômica — o produtor vs. o juridiquês bancário. Não é scraxado, é inteligente e baseado em situações reais.',
+    dor:'"Esse sou eu / esse é meu pai / meu vizinho." A identificação gera compartilhamento orgânico e traz novos seguidores qualificados.',
+    tags:['Humor','Identificação','Compartilhamento','Viral','Leve','Alcance']}
+];
+
+const stratData = [
+  { icon:'🔁', titulo:'Alternância de Pilares',
+    texto:'Nunca dois vídeos do mesmo pilar em sequência. Evita fadiga temática e garante que o feed nunca pareça "mais do mesmo".',
+    items:['Seg/Sex: O Bolso ou Pé no Barro (abertura e fechamento com carga emocional)','Ter/Qui: Empresa Rural ou Tradutor (utilidade concreta e leveza)','Qua: Pé no Barro ou Notícia (Q&A ou bastidor de meio de semana)']},
+  { icon:'💾', titulo:'Conteúdo Salvável',
+    texto:'A métrica mais valiosa hoje é o salvamento — sinaliza que o conteúdo tem valor utilitário real e prático.',
+    items:['Listas práticas (3 direitos, 5 pontos a verificar, 4 passos)','Glossários bancários no formato "tradução para o campo"','Checklists de ação imediata ("o que fazer nas primeiras 24h")','Conteúdo de alerta sobre juros abusivos e penhoras']},
+  { icon:'💬', titulo:'Conteúdo Comentável',
+    texto:'Comentários amplificam o alcance orgânico. CTAs com palavra-chave qualificam leads no próprio comentário.',
+    items:['Perguntas que ativam memória pessoal de dívida ou execução','Situações de identificação com o banco ("eles me forçaram a contratar")','Polêmicas leves (banco, juros, cartório, oficial de justiça)','Q&A explícito solicitando dúvidas nos comentários']},
+  { icon:'🚀', titulo:'Conteúdo Compartilhável',
+    texto:'O compartilhamento orgânico indica que o conteúdo tocou em algo real. Três gatilhos principais:',
+    items:['Identificação: "Esse sou eu / esse é meu vizinho / meu cunhado"','Utilidade para o outro: "Preciso mandar isso pra fulano agora"','Humor com verdade: O Tradutor do Campo é o pilar de maior potencial de share']},
+  { icon:'📈', titulo:'Funil Implícito — Nicho Bancário',
+    texto:'Os 20 vídeos constroem um funil sem parecer funil:',
+    items:['Topo: Pilar E (Tradutor) + Pilar D (Pé no Barro) → awareness, novos seguidores','Meio: Pilar B (O Bolso) + Pilar C (Empresa) → educação, confiança, salvamentos','Fundo: Pilar A (Bancário/Legado) → urgência, emoção, conversão em consulta','Fechamento: Vídeo #20 com CTA direto para agendamento']},
+  { icon:'⚡', titulo:'Ganchos de 3 Segundos',
+    texto:'Cada vídeo estruturado com gancho no padrão de maior retenção:',
+    items:['Afirmação bombástica: dado sobre contratos irregulares ou penhora','Pergunta de identificação: "o banco te forçou a assinar algo?"','Revelação de direito: "você tem um direito que o banco não vai te contar"','Situação de dor imediata: bloqueio, leilão, oficial de justiça']}
+];
+
+const _allStories = [];
+
+function buildStories() {
+  const nav = document.getElementById('stories-week-nav');
+  const cont = document.getElementById('stories-content');
+  storyWeeks.forEach((wk, wi) => {
+    const btn = document.createElement('button');
+    btn.className = 'wbtn' + (wi===0?' active':'');
+    btn.textContent = wk.label;
+    btn.onclick = () => showStoryWeek(wi);
+    nav.appendChild(btn);
+    const wp = document.createElement('div');
+    wp.className = 'wk-panel' + (wi===0?' active':'');
+    wp.id = 'swk-' + wi;
+    let html = `<div class="wk-head"><div class="wk-num">0${wi+1}</div><div class="wk-meta"><div class="wk-name">${wk.label} — ${wk.sub.split('·').slice(1).join('·').trim()}</div><div class="wk-sub">${wk.sub}</div></div></div>`;
+    wk.days.forEach(d => {
+      html += `<div class="day-sec"><div class="day-hd"><div class="day-pill">${d.pill}</div><div class="day-theme">${d.theme}</div><div class="day-rule"></div></div><div class="stories-row">`;
+      d.stories.forEach(s => {
+        const idx = _allStories.length;
+        _allStories.push(s);
+        const warnBadgeHtml = s.warn ? `<span class="warn-badge">⚠️ Validar</span>` : '';
+        html += `<div class="scard" data-idx="${idx}">
+          <div class="sbar ${s.bar}"></div>
+          <div class="scard-body">
+            <div class="scard-top">
+              <div class="sday-n">${s.n}</div>
+              <div class="scard-badges">
+                <span class="tbadge ${s.bc}">${s.badge}</span>
+                <span class="fmt-badge">${s.fmt.split(' ')[0]}</span>
+                ${s.ia ? `<span class="ia-badge" style="font-size:7px">${s.ia.split(' ')[0]}</span>` : ''}
+                ${warnBadgeHtml}
+              </div>
+            </div>
+            <div class="scard-title">${s.title}</div>
+            <div class="scard-caption">${s.caption}</div>
+            <div class="scard-foot">
+              <div class="scard-el"><div class="el-dot"></div>${s.els[0].v}</div>
+              <div class="scard-arr">→</div>
+            </div>
+          </div>
+        </div>`;
+      });
+      html += `</div></div>`;
+    });
+    wp.innerHTML = html;
+    cont.appendChild(wp);
+  });
+
+  document.getElementById('stories-content').addEventListener('click', e => {
+    const card = e.target.closest('.scard');
+    if (card) openSModal(_allStories[+card.dataset.idx]);
+  });
+}
+
+function showStoryWeek(i) {
+  document.querySelectorAll('#stories-week-nav .wbtn').forEach((b,j) => b.classList.toggle('active', i===j));
+  document.querySelectorAll('.wk-panel').forEach((p,j) => p.classList.toggle('active', i===j));
+}
+
+function openSModal(s) {
+  document.getElementById('m-bar').className = 'm-top ' + s.bar;
+  const badge = document.getElementById('m-badge');
+  badge.className = 'tbadge ' + s.bc;
+  badge.textContent = s.badge;
+  document.getElementById('m-title').textContent = s.title;
+  document.getElementById('m-cap').textContent = s.caption;
+  document.getElementById('m-rot').textContent = s.roteiro;
+  const fmtEl = document.getElementById('m-fmt');
+  let fmtHtml = `<div class="m-fmt-pill"><span>${s.fmt.split(' ')[0]}</span><div><strong>Mídia</strong>${s.fmt.replace(/^[^\s]+\s/,'')}</div></div>`;
+  if(s.ia) fmtHtml += `<div class="m-fmt-pill m-fmt-pill-ia"><span>${s.ia.split(' ')[0]}</span><div><strong>Interação IG</strong>${s.ia.replace(/^[^\s]+\s/,'')}</div></div>`;
+  else fmtHtml += `<div class="m-fmt-pill"><span>⬜</span><div><strong>Interação IG</strong>Nenhuma</div></div>`;
+  if(s.warn) fmtHtml += `<div class="m-fmt-pill m-fmt-pill-warn"><span>⚠️</span><div><strong>Atenção</strong>Validar com jurídico</div></div>`;
+  fmtEl.innerHTML = fmtHtml;
+  document.getElementById('m-els').innerHTML = s.els.map(e => {
+    const isWarn = e.l.includes('⚠️') || e.l.includes('Atenção');
+    return `<div class="m-item${isWarn?' m-item-warn':''}"><div class="m-il">${e.l}</div><div class="m-iv">${e.v}</div></div>`;
+  }).join('');
+  document.getElementById('m-cta').textContent = s.cta;
+  document.getElementById('smodal').classList.add('open');
+}
+
+function closeSModal(e) {
+  if(e.target===document.getElementById('smodal')) document.getElementById('smodal').classList.remove('open');
+}
+
+function buildFeed() {
+  const weeks = [1,2,3,4];
+  let html = '';
+  weeks.forEach(w => {
+    const vids = feedData.filter(v => v.week === w);
+    html += `<div class="week-lbl"><h3>📅 Semana ${w}</h3></div><div class="videos-grid">`;
+    vids.forEach(v => {
+      html += `<div class="vcard" onclick="toggleVCard(this)">
+        <div class="vcard-top ${v.pilarClass}-bg">
+          <div class="vnum ${v.pilarClass}-c">${v.n}</div>
+          <div class="vmeta">
+            <div class="vpilar ${v.pilarClass}-t">${v.pilar}</div>
+            <div class="vtitle">${v.title}</div>
+          </div>
+          <div class="vday"><strong>Dia ${v.day}</strong>${v.dayLabel}</div>
+        </div>
+        <div class="vdiv"></div>
+        <div class="vgancho">${v.gancho}</div>
+        <div class="vdetails">
+          <div class="dlbl">Ideia do Conteúdo</div>
+          <div class="dtext">${v.ideia}</div>
+          <div class="dlbl">Objetivo</div>
+          <div class="dobj" style="margin-bottom:12px">${v.objetivo}</div>
+          <div class="dlbl">Estrutura</div>
+          <ul class="dsteps">${v.steps.map((s,i)=>`<li data-s="0${i+1}">${s}</li>`).join('')}</ul>
+          <div class="dcta">${v.cta}</div>
+        </div>
+        <div class="vhint">▼ Ver estrutura completa</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('feed-content').innerHTML = html;
+}
+
+function toggleVCard(card) {
+  const was = card.classList.contains('expanded');
+  document.querySelectorAll('.vcard.expanded').forEach(c => {
+    c.classList.remove('expanded');
+    c.querySelector('.vhint').textContent = '▼ Ver estrutura completa';
+  });
+  if(!was) {
+    card.classList.add('expanded');
+    card.querySelector('.vhint').textContent = '▲ Fechar';
+  }
+}
+
+function buildPilares() {
+  document.getElementById('pilares-content').innerHTML = pilaresData.map(p => `
+    <div class="pcard">
+      <div class="pcard-hd ${p.cls}-hd">
+        <div class="picon ${p.cls}-icon">${p.icon}</div>
+        <div><h3>${p.nome}</h3><p>${p.sub}</p></div>
+      </div>
+      <div class="pcard-body">
+        <p><strong>Objetivo estratégico:</strong> ${p.obj}</p>
+        <p><strong>Tipo de conteúdo:</strong> ${p.tipo}</p>
+        <p><strong>Dor central:</strong> ${p.dor}</p>
+        <div class="ptags">${p.tags.map(t=>`<span class="ptag">${t}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+
+function buildStrat() {
+  document.getElementById('strat-content').innerHTML = stratData.map(s => `
+    <div class="strat-card">
+      <h3>${s.icon} ${s.titulo}</h3>
+      <p>${s.texto}</p>
+      <ul>${s.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    </div>`).join('');
+  document.getElementById('insight-box').innerHTML = `
+    <h3>🏦 Por que o nicho bancário rural tem alto potencial no conteúdo agro</h3>
+    <p>O produtor rural brasileiro carrega dois fardos: o risco da colheita e o risco financeiro com o banco. Enquanto o primeiro é amplamente discutido, o segundo é pouco abordado com clareza — criando um gap de informação que o Queiroz Associados pode preencher com autoridade.</p>
+    <p>O diferencial deste conteúdo não é "falar de lei bancária" — é <strong>falar da terra, da dívida real e do maquinário em risco</strong>. Isso ressoa com quem acorda preocupado com o vencimento do financiamento, não com conceitos jurídicos abstratos.</p>
+    <p>A combinação de <strong>dado impactante sobre contratos + urgência real de execução + instrumentos de defesa acessíveis</strong> é o triângulo que gera salvamentos, comentários e DMs qualificados no nicho agro bancário.</p>`;
+}
+
+document.querySelectorAll('.mtab').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.mtab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') document.getElementById('smodal').classList.remove('open');
+});
+
+buildStories(); buildFeed(); buildPilares(); buildStrat();
+</script>
+</body>
+</html>
